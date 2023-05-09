@@ -1,0 +1,81 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+
+use App\Models\Lecturers;
+use Illuminate\Http\Request;
+
+class LecturersController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
+        //
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        //
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        $rules = [
+            'name' => 'required|string|max:255',
+            'email' => 'required|unique:lecturers,email|email|max:255',
+            'password' => 'required|string|min:8',
+            'role' => 'nullable|in:lecturer,teaching assistant',
+        ];
+
+        $validated = $request->validate($rules);
+
+        $lecturer = new Lecturers;
+        $lecturer->fill($validated);
+        $lecturer->password = bcrypt($request->password);
+        $lecturer->save();
+
+        return response()->json(['message' => 'Lecturer created successfully', 'data' => $lecturer]);
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(Lecturers $lecturers)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(Lecturers $lecturers)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, Lecturers $lecturers)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(Lecturers $lecturers)
+    {
+        //
+    }
+}
