@@ -93,21 +93,5 @@ class ProgrammesController extends Controller
      * @param  int  $courseId
      * @return \Illuminate\Http\Response
      */
-    public function addCourse(Request $request)
-    {
-        // Find the program by ID
-        $programme = Programmes::find($request->programme_id);
 
-        // Find the course by ID
-        $course = Courses::find($request->course_id);
-
-        // Add the course to the program's courses
-        $programme->courses()->attach($course);
-
-        // Return a response
-        return response()->json([
-            'message' => 'Course added to program successfully.',
-            'programme' => $programme->load('courses'),
-        ], 200);
-    }
 }

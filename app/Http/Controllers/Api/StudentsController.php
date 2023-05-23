@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+
 use Illuminate\Http\Request;
 
 use App\Models\Students;
@@ -28,30 +29,8 @@ class StudentsController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
-    {
-        $rules = [
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:students,email',
-            'username' => 'required|string|unique:students,username',
-            'password' => 'required|string|min:8',
-            'programme_id' => 'required|exists:programmes,id',
-            'current_level' => 'nullable|in:100,200,300,400',
-        ];
+    public function store(Request $request){
 
-        $messages = [
-            'programme_id.exists' => 'The selected programme is invalid.',
-            'current_level.in' => 'The selected level is invalid.',
-        ];
-
-        $validatedData = $request->validate($rules, $messages);
-
-        $student = Students::create($validatedData);
-
-        return response()->json([
-            'message' => 'Student created successfully',
-            'data' => $student,
-        ], 201);
     }
 
     /**

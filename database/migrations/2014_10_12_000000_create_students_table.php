@@ -18,8 +18,8 @@ return new class extends Migration
             $table->string('username')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->unsignedBigInteger('programme_id')->references('id')->on('programmes');
-            $table->enum('current_level', array('100','200','300','400'))->nullable()->default('100');
+            $table->integer('programme_id')->references('id')->on('programmes');
+            $table->string('current_level')->nullable()->default('100');
             $table->rememberToken();
             $table->timestamps();
             $table->softDeletes(); // Add soft deletes

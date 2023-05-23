@@ -30,21 +30,7 @@ class LecturersController extends Controller
      */
     public function store(Request $request)
     {
-        $rules = [
-            'name' => 'required|string|max:255',
-            'email' => 'required|unique:lecturers,email|email|max:255',
-            'password' => 'required|string|min:8',
-            'role' => 'nullable|in:lecturer,teaching assistant',
-        ];
 
-        $validated = $request->validate($rules);
-
-        $lecturer = new Lecturers;
-        $lecturer->fill($validated);
-        $lecturer->password = bcrypt($request->password);
-        $lecturer->save();
-
-        return response()->json(['message' => 'Lecturer created successfully', 'data' => $lecturer]);
     }
 
     /**
