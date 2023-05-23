@@ -15,12 +15,10 @@ return new class extends Migration
     {
         Schema::create('courses', function (Blueprint $table) {
             $table->id();
-            $table->string('code')->unique('course_code');
-            $table->string('name')->index('course_name');
+            $table->string('course_code')->unique('course_code');
+            $table->string('course_name')->index('course_name');
             $table->integer('credit_unit')->default(1);
             $table->text('course_desc')->nullable();
-            $table->date('course_start')->index('course_start');
-            $table->date('course_end')->index('course_end');
             $table->timestamps();
             $table->softDeletes(); // Add soft deletes
         });

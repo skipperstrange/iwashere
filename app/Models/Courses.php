@@ -14,12 +14,10 @@ class Courses extends Model
     use HasFactory;
 
     protected $fillable = [
-    'code',
-    'name',
+    'course_code',
+    'course_name',
     'credit_unit',
     'course_desc',
-    'course_start',
-    'course_end',
     ];
 
     public function lecturers()

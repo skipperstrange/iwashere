@@ -18,12 +18,12 @@ class CoursesController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'code' => 'required|unique:courses',
-            'name' => 'required',
+            'course_code' => 'required|unique:courses',
+            'course_name' => 'required',
             'credit_unit' => 'required|integer',
             'course_desc' => 'nullable',
-            'course_start' => 'required|date',
-            'course_end' => 'required|date|after_or_equal:course_start',
+            //'course_start' => 'required|date',
+            //'course_end' => 'required|date|after_or_equal:course_start',
         ]);
 
         $course = Courses::create($validatedData);
@@ -36,12 +36,14 @@ class CoursesController extends Controller
 
     public function show($id)
     {
-        $course = Courses::find($id);
+        $course = Courses::where('id', $id)
+            ->orWhere('course_code',$id)
+           // ->orWhere('course_code','LIKE' ,"%$id%")
+            ->first();
 
         if (!$course) {
-            return response()->json(['error' => 'Course not found'], 404);
+            return response()->json(['error' => 'No course found'], 404);
         }
-        $course['programmes'] = $course->programmes;
 
         return response()->json($course);
     }

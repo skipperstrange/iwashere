@@ -17,6 +17,7 @@ class Lecturers extends Authenticatable
         'email',
         'phone_number',
         'staff_id',
+        'role'
     ];
 
 

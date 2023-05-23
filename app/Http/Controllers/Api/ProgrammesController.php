@@ -52,10 +52,13 @@ class ProgrammesController extends Controller
      */
     public function show($id)
     {
-        $programme = Programmes::find($id);
+        $programme = Programmes::where('id', $id)
+            ->orWhere('programme_code',$id)
+           // ->orWhere('course_code','LIKE' ,"%$id%")
+            ->first();
 
         if (!$programme) {
-            return response()->json(['error' => 'Course not found'], 404);
+            return response()->json(['error' => 'No programme found'], 404);
         }
         $programme['courses'] = $programme->course;
 

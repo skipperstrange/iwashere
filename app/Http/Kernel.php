@@ -45,6 +45,9 @@ class Kernel extends HttpKernel
             \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
 
         ],
+        'public' => [
+        // Add any middleware that should be applied to public routes only.
+    ]   ,
     ];
 
     /**
@@ -66,4 +69,10 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
     ];
+
+    protected $routeMiddleware = [
+    // Other middleware entries...
+    'role' => \App\Http\Middleware\RoleAuthorization::class,
+];
+
 }

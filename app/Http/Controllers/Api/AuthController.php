@@ -39,6 +39,7 @@ class AuthController extends Controller
        $messages = [
             'programme_id.exists' => 'The selected programme does not exist.',
             'current_level.in' => 'The selected level is invalid.',
+
         ];
 
         $validated = $request->validate($rules,$messages);
@@ -76,12 +77,19 @@ class AuthController extends Controller
 
     function adminRegister(Request $request){
          $rules = [
-            'name' => 'required|string|max:255',
-            'email' => 'required|unique:lecturers,email|email|max:255',
-            'password' => 'required|string|min:8|confirmed'
+            'name' => 'required|unique:users|string|max:255',
+            'email' => 'required|unique:users|email|max:255',
+            'password' => 'required|string|min:8|confirmed',
+            'role' => 'required'
         ];
 
-        $validated = $request->validate($rules);
+        $messages = [
+            'email.unique' => 'Email already exists.',
+            'name.unique' => 'Username already exists.',
+        ];
+
+
+        $validated = $request->validate($rules, $messages);
 
         $user = new User();
         $user->fill($validated);

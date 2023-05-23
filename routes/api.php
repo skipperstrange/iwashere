@@ -21,7 +21,7 @@ use App\Http\Controllers\Api\AuthController;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+Route::get('/user', function (Request $request) {
     return $request->user();
 });
 
@@ -35,8 +35,7 @@ Route::get('/', function(){
 
 //Route::resource('students', StudentsController::class);
 //Route::resource('lecturers', LecturersController::class);
-Route::get('/programmes', [ProgrammesController::class, 'index']);
-Route::get('/programmes/{id}', [ProgrammesController::class, 'show']);
+
 
 //Route::resource('courses', CoursesController::class);
 
@@ -47,14 +46,40 @@ Route::get('/courses/search/{query}', [CoursesController::class, 'search']); //S
 
 
 
-Route::middleware('auth:sanctum')->post('/student/register', [AuthController::class, 'studentRegister']);
-Route::middleware('auth:sanctum')->post('/lecturer/register', [AuthController::class, 'lecturerRegister']);
-//Route::middleware('auth:sanctum')->post('/admin/register', [AuthController::class, 'adminRegister']);
-Route::post('/admin/register', [AuthController::class, 'adminRegister']);
+//Route::post('/admin/register', [AuthController::class, 'adminRegister']);
 
 
-Route::middleware('auth:sanctum')->post('/programmes', [ProgrammesController::class, 'store']);
-Route::middleware('auth:sanctum')->post('/addprogrammecourse', [ProgrammeCoursesController::class, 'attachCourseToProgramme']);
+
+
+Route::group(['middleware' => ['auth:sanctum', 'role:admin']], function () {
+    //Users, Students, and Lectures
+    Route::post('/student/register', [AuthController::class, 'studentRegister']);
+    Route::post('/students', [StudentsController::class, 'index']);
+    Route::post('/students/{id}', [StudentsController::class, 'show']);
+
+
+    Route::post('/lecturer/register', [AuthController::class, 'lecturerRegister']);
+    Route::post('/lecturer', [LecturersController::class, 'index']);
+    Route::post('/lecturer/{id}', [LecturersController::class, 'show']);
+
+    //Courses   and Programmes
+    Route::post('/courses/register', [CoursesController::class, 'store']);
+    Route::post('/programmes/register', [ProgrammesController::class, 'store']);
+    Route::post('/addprogrammecourse', [ProgrammeCoursesController::class, 'attachCourseToProgramme']);
+}); // admin cases
+
+Route::middleware('public')->post('/admin/register', [AuthController::class, 'adminRegister']);
+
+Route::group(['middleware' => ['public']], function () {
+Route::get('/programmes', [ProgrammesController::class, 'index']);
+Route::get('/programmes/{id}', [ProgrammesController::class, 'show']);
+Route::get('/courses', [CoursesController::class, 'index']);
+Route::get('/courses/{id}', [CoursesController::class, 'show']);
+}); // public routes
+
+
+
+
 
 
 Route::post('/auth/student', [AuthController::class, 'student']);
