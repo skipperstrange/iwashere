@@ -1,13 +1,10 @@
 <?php
-
-
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Students;
 use App\Models\Lecturers;
 use App\Models\User;
-
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -16,26 +13,55 @@ class AuthController extends Controller
 {
     //
     function studentLogin(Request $request){
+         $fields = $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|string'
+        ]);
 
+        $user = Students::where(['email'=> $fields['email']])
+        ->orWhere('username',$fields['email'])
+        ->first();
 
+        if(!$user || !Hash::check($fields['password'], $user->password)){
+            return response()->json(['message' =>'Invalid credentials'], 401);
+        }
+        $user->type = 'student';
+        $token = $user->createToken('token')->plainTextToken;
+
+        return response()->json(['message' => 'Success', 'data' => $user, 'token' => $token],200);
     }
 
     function lecturerLogin(Request $request){
+         $fields = $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|string'
+        ]);
 
+        $user = Lecturers::where(['email'=> $fields['email']])->first();
+
+        if(!$user || !Hash::check($fields['password'], $user->password)){
+            return response()->json(['message' =>'Invalid credentials'], 401);
+        }
+        $user->type = 'tutor';
+        $token = $user->createToken('token')->plainTextToken;
+
+        return response()->json(['message' => 'Success', 'data' => $user, 'token' => $token],200);
     }
 
     function adminLogin(Request $request){
          $fields = $request->validate([
-            'email' => 'required',
-            'password' => 'required'
+            'email' => 'required|email',
+            'password' => 'required|string'
         ]);
 
-        $user = User::where(['email'=> $fields['email']])->first();
+        $user = User::where(['email'=> $fields['email']])
+        ->orWhere('username',$fields['email'])
+        ->first();
 
         if(!$user || !Hash::check($fields['password'], $user->password)){
-            return response()->json(['message' =>'Wrong username or password. '.Hash::check($fields['password'], $user->password)], 401);
+            return response()->json(['message' =>'Invalid credentials'], 401);
         }
-
+        $user->type = 'admin';
         $token = $user->createToken('token')->plainTextToken;
 
         return response()->json(['message' => 'Success', 'data' => $user, 'token' => $token],200);
@@ -44,9 +70,9 @@ class AuthController extends Controller
 
      function studentRegister(Request $request){
         $rules  = [
-            'name' => 'required|string|max:255',
+            'name' => ['required', 'string', 'max:255'],
             'email' => 'required|email|unique:students,email',
-            'username' => 'required|string|unique:students,username',
+            'username' => ['required', 'string', 'regex:/^[a-zA-Z0-9]+$/'],
             'password' => 'required|string|min:8|confirmed',
             'programme_id' => 'nullable|exists:programmes,id',
             'current_level' => 'nullable',
@@ -54,7 +80,7 @@ class AuthController extends Controller
        $messages = [
             'programme_id.exists' => 'The selected programme does not exist.',
             'current_level.in' => 'The selected level is invalid.',
-
+            'username.regex' => 'The username field should not contain spaces or special characters.',
         ];
 
         $validated = $request->validate($rules,$messages);
@@ -76,7 +102,12 @@ class AuthController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|unique:lecturers,email|email|max:255',
             'password' => 'required|string|min:8|confirmed',
+            'phone' => 'required|string|max:13|min:10',
             'role' => 'nullable|in:lecturer,teaching assistant',
+        ];
+        $messages = [
+            'email.unique' => 'Email already exists.',
+            'username.regex' => 'The username field should not contain spaces or special characters.',
         ];
 
         $validated = $request->validate($rules);
@@ -93,6 +124,7 @@ class AuthController extends Controller
     function adminRegister(Request $request){
          $rules = [
             'name' => 'required|unique:users|string|max:255',
+            'username' => ['required', 'string', 'regex:/^[a-zA-Z0-9]+$/'],
             'email' => 'required|unique:users|email|max:255',
             'password' => 'required|string|min:8|confirmed',
             'role' => 'required'
@@ -100,7 +132,8 @@ class AuthController extends Controller
 
         $messages = [
             'email.unique' => 'Email already exists.',
-            'name.unique' => 'Username already exists.',
+            'username.unique' => 'Username already exists.',
+            'username.regex' => 'The username field should not contain spaces or special characters.',
         ];
 
 
@@ -115,7 +148,7 @@ class AuthController extends Controller
         return response()->json(['message' => 'Admin created successfully', 'data' => $user, 'token' => $token],201);
     }
 
-    function adminLogout() {
+    function logout() {
         auth()->user()->tokens()->delete();
         return response()->json([
             'message' => 'Logged out successfully',

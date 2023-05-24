@@ -8,7 +8,7 @@ use App\Http\Controllers\Api\LecturersController;
 use App\Http\Controllers\Api\ProgrammesController;
 use App\Http\Controllers\Api\ProgrammeCoursesController;
 use App\Http\Controllers\Api\AuthController;
-use Illuminate\Auth\Events\Logout;
+use App\Http\Middleware\GuestOnlyMiddleware;
 
 /*
 |--------------------------------------------------------------------------
@@ -69,7 +69,7 @@ Route::group(['middleware' => ['auth:sanctum', 'role:admin']], function () {
 }); // admin cases
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
-    Route::post('/logout', [AuthController::class, 'adminLogout']);
+    Route::post('/logout', [AuthController::class, 'logout']);
 });
 
 Route::middleware('public')->post('/admin/register', [AuthController::class, 'adminRegister']);
@@ -80,14 +80,11 @@ Route::get('/programmes/{id}', [ProgrammesController::class, 'show']);
 Route::get('/courses', [CoursesController::class, 'index']);
 Route::get('/courses/{id}', [CoursesController::class, 'show']);
 
-
-Route::post('/admin/login', [AuthController::class, 'adminLogin']);
-
 }); // public routes
 
-
-
-
+Route::middleware([GuestOnlyMiddleware::class])->post('/admin/login', [AuthController::class, 'adminLogin']);
+Route::middleware([GuestOnlyMiddleware::class])->post('/student/login', [AuthController::class, 'studentLogin']);
+Route::middleware([GuestOnlyMiddleware::class])->post('/lecturer/login', [AuthController::class, 'lecturerLogin']);
 
 
 Route::post('/auth/student', [AuthController::class, 'student']);
