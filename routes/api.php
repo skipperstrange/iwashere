@@ -8,7 +8,7 @@ use App\Http\Controllers\Api\LecturersController;
 use App\Http\Controllers\Api\ProgrammesController;
 use App\Http\Controllers\Api\ProgrammeCoursesController;
 use App\Http\Controllers\Api\AuthController;
-
+use Illuminate\Auth\Events\Logout;
 
 /*
 |--------------------------------------------------------------------------
@@ -68,6 +68,10 @@ Route::group(['middleware' => ['auth:sanctum', 'role:admin']], function () {
     Route::post('/addprogrammecourse', [ProgrammeCoursesController::class, 'attachCourseToProgramme']);
 }); // admin cases
 
+Route::group(['middleware' => ['auth:sanctum']], function () {
+    Route::post('/logout', [AuthController::class, 'adminLogout']);
+});
+
 Route::middleware('public')->post('/admin/register', [AuthController::class, 'adminRegister']);
 
 Route::group(['middleware' => ['public']], function () {
@@ -75,6 +79,10 @@ Route::get('/programmes', [ProgrammesController::class, 'index']);
 Route::get('/programmes/{id}', [ProgrammesController::class, 'show']);
 Route::get('/courses', [CoursesController::class, 'index']);
 Route::get('/courses/{id}', [CoursesController::class, 'show']);
+
+
+Route::post('/admin/login', [AuthController::class, 'adminLogin']);
+
 }); // public routes
 
 

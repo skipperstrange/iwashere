@@ -10,6 +10,7 @@ use App\Models\User;
 
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -24,6 +25,20 @@ class AuthController extends Controller
     }
 
     function adminLogin(Request $request){
+         $fields = $request->validate([
+            'email' => 'required',
+            'password' => 'required'
+        ]);
+
+        $user = User::where(['email'=> $fields['email']])->first();
+
+        if(!$user || !Hash::check($fields['password'], $user->password)){
+            return response()->json(['message' =>'Wrong username or password. '.Hash::check($fields['password'], $user->password)], 401);
+        }
+
+        $token = $user->createToken('token')->plainTextToken;
+
+        return response()->json(['message' => 'Success', 'data' => $user, 'token' => $token],200);
 
     }
 
@@ -95,9 +110,16 @@ class AuthController extends Controller
         $user->fill($validated);
         $user->password = bcrypt($request->password);
         $user->save();
-        $token = $user->createToken('lecturerToken')->plainTextToken;
+        $token = $user->createToken('token')->plainTextToken;
 
         return response()->json(['message' => 'Admin created successfully', 'data' => $user, 'token' => $token],201);
+    }
+
+    function adminLogout() {
+        auth()->user()->tokens()->delete();
+        return response()->json([
+            'message' => 'Logged out successfully',
+        ]);
     }
 
 }
