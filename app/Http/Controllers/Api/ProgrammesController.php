@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 
 use App\Models\Programmes;
 use App\Models\Courses;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class ProgrammesController extends Controller
 {
@@ -60,7 +62,7 @@ class ProgrammesController extends Controller
         if (!$programme) {
             return response()->json(['error' => 'No programme found'], 404);
         }
-        $programme['courses'] = $programme->course;
+        $programme['courses'] = $programme->courses;
 
         return response()->json($programme);
     }
@@ -87,6 +89,48 @@ class ProgrammesController extends Controller
     public function destroy(Programmes $programmes)
     {
         //
+    }
+
+    public function addCourseToProgramme($programmeId, $courseId)
+    {
+        try {
+        $programme = Programmes::findOrFail($programmeId);
+            try {
+                    $course = Courses::findOrFail($courseId);
+                    try {
+                        $programme->courses()->attach($course, [], true);
+                    } catch (Exception $e) {
+                        return response()->json([
+                            'error' => $e
+                        ], 409);
+                    }
+                } catch (ModelNotFoundException $e) {
+                        return response()->json([
+                        'error' => 'Course not found.'
+                    ], 404);
+                }
+            // Return a response indicating success
+            return response()->json([
+                'message' => 'Course added to programme successfully.'
+            ]);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'error' => 'Programme not found.'
+            ], 404);
+        }
+    }
+
+    public function addProgrammeToCourse($courseId, $programmeId)
+    {
+        $course = Courses::findOrFail($courseId);
+        $programme = Programmes::findOrFail($programmeId);
+
+        $course->programmes()->attach($programme);
+
+        // Return a response indicating success
+        return response()->json([
+            'message' => 'Programme added to course successfully.'
+        ]);
     }
 
     /**

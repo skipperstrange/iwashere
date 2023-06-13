@@ -9,6 +9,8 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use App\Models\StudentCourses;
 use App\Models\Programmes;
+use App\Models\Courses;
+use App\Models\ProgrammesCourses;
 
 class Students extends Authenticatable
 {
@@ -24,8 +26,21 @@ class Students extends Authenticatable
     'programme_id'
     ];
 
-    function student_courses(){
-        return $this->hasMany(StudentCourses::class);
+    protected static function booted()
+    {
+        static::created(function ($student) {
+            $programmeId = $student->programme_id;
+
+            // Retrieve the courses associated with the programme
+            $programmeCourses = ProgrammesCourses::where('programme_id', $programmeId)->pluck('course_id');
+
+            // Attach the courses to the student
+            $student->courses()->attach($programmeCourses);
+        });
+    }
+
+    function courses(){
+        return $this->belongsToMany(Courses::class, 'student_courses', 'student_id', 'course_id');
     }
 
     function programme(){

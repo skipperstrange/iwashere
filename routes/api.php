@@ -50,7 +50,7 @@ Route::get('/courses/search/{query}', [CoursesController::class, 'search']); //S
 
 
 
-
+// admin roles
 Route::group(['middleware' => ['auth:sanctum', 'role:admin']], function () {
     //Users, Students, and Lectures
     Route::post('/student/register', [AuthController::class, 'studentRegister']);
@@ -65,14 +65,22 @@ Route::group(['middleware' => ['auth:sanctum', 'role:admin']], function () {
     //Courses   and Programmes
     Route::post('/courses/register', [CoursesController::class, 'store']);
     Route::post('/programmes/register', [ProgrammesController::class, 'store']);
-    Route::post('/addprogrammecourse', [ProgrammeCoursesController::class, 'attachCourseToProgramme']);
-}); // admin cases
+    Route::post('/addprogrammecourse/{programmeId}/{CourseId}', [ProgrammesController::class, 'addCourseToProgramme']);
+});
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 });
 
+// admin and lecturer roles
+Route::group(['middleware' => ['auth:sanctum', 'role:admin', 'role:lecturer']], function () {
+    Route::post('/addprogrammecourse/{programmeId}/{CourseId}', [StudentsController::class, 'addCourseToProgramme']);
+});
+
+
 Route::middleware('public')->post('/admin/register', [AuthController::class, 'adminRegister']);
+
+
 
 Route::group(['middleware' => ['public']], function () {
 Route::get('/programmes', [ProgrammesController::class, 'index']);

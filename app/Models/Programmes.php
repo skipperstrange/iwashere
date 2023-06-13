@@ -18,11 +18,8 @@ class Programmes extends Model
 
     public function courses()
     {
-        return $this->belongsToMany(Course::class, 'programmes_courses', 'programme_id', 'course_id');
+        return $this->belongsToMany(Courses::class, 'programmes_courses', 'programme_id', 'course_id');
     }
 
-    public function students()
-    {
-        return $this->belongsToMany(Students::class, 'programmes_courses', 'programme_id', 'course_id');
-    }
+
 }
