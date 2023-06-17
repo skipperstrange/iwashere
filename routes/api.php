@@ -74,7 +74,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
 // admin and lecturer roles
 Route::group(['middleware' => ['auth:sanctum', 'role:admin', 'role:lecturer']], function () {
-    Route::post('/addprogrammecourse/{programmeId}/{CourseId}', [StudentsController::class, 'addCourseToProgramme']);
+ //   Route::post('/addprogrammecourse/{programmeId}/{CourseId}', [StudentsController::class, 'addCourseToProgramme']);
 });
 
 
