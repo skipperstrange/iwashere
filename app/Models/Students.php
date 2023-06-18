@@ -5,9 +5,9 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Support\Facades\Request;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-use App\Models\StudentCourses;
 use App\Models\Programmes;
 use App\Models\Courses;
 use App\Models\ProgrammesCourses;
@@ -23,8 +23,16 @@ class Students extends Authenticatable
     'username',
     'password',
     'current_level',
-    'programme_id'
+    'programme_id',
+    'role'
     ];
+
+    public function getTokenFromHeader()
+    {
+        $token = Request::header('Authorization');
+
+        return $token;
+    }
 
     protected static function booted()
     {

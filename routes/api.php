@@ -6,7 +6,6 @@ use App\Http\Controllers\Api\CoursesController;
 use App\Http\Controllers\Api\StudentsController;
 use App\Http\Controllers\Api\LecturersController;
 use App\Http\Controllers\Api\ProgrammesController;
-use App\Http\Controllers\Api\ProgrammeCoursesController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Middleware\GuestOnlyMiddleware;
 
@@ -76,6 +75,14 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 Route::group(['middleware' => ['auth:sanctum', 'role:admin', 'role:lecturer']], function () {
  //   Route::post('/addprogrammecourse/{programmeId}/{CourseId}', [StudentsController::class, 'addCourseToProgramme']);
 });
+
+
+// student roles
+Route::group(['middleware' => ['auth:sanctum', 'role:student']], function () {
+    Route::post('/student/courses', [StudentsController::class, 'courses']);
+});
+
+
 
 
 Route::middleware('public')->post('/admin/register', [AuthController::class, 'adminRegister']);

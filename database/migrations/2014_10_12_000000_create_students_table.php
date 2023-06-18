@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('password');
             $table->integer('programme_id')->references('id')->on('programmes');
             $table->string('current_level')->nullable()->default('100');
+              $table->enum('role', array('student'))->nullable()->default('student');
             $table->rememberToken();
             $table->timestamps();
             $table->softDeletes(); // Add soft deletes

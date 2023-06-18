@@ -25,7 +25,7 @@ class AuthController extends Controller
         if(!$user || !Hash::check($fields['password'], $user->password)){
             return response()->json(['message' =>'Invalid credentials'], 401);
         }
-        $user->type = 'student';
+        $user->role = 'student';
         $token = $user->createToken('token')->plainTextToken;
 
         return response()->json(['message' => 'Success', 'data' => $user, 'token' => $token],200);
@@ -42,7 +42,6 @@ class AuthController extends Controller
         if(!$user || !Hash::check($fields['password'], $user->password)){
             return response()->json(['message' =>'Invalid credentials'], 401);
         }
-        $user->type = 'tutor';
         $token = $user->createToken('token')->plainTextToken;
 
         return response()->json(['message' => 'Success', 'data' => $user, 'token' => $token],200);
@@ -61,7 +60,6 @@ class AuthController extends Controller
         if(!$user || !Hash::check($fields['password'], $user->password)){
             return response()->json(['message' =>'Invalid credentials'], 401);
         }
-        $user->type = 'admin';
         $token = $user->createToken('token')->plainTextToken;
 
         return response()->json(['message' => 'Success', 'data' => $user, 'token' => $token],200);
@@ -72,15 +70,17 @@ class AuthController extends Controller
         $rules  = [
             'name' => ['required', 'string', 'max:255'],
             'email' => 'required|email|unique:students,email',
-            'username' => ['required', 'string', 'regex:/^[a-zA-Z0-9]+$/'],
+            'username' => ['required', 'string', 'regex:/^[a-zA-Z0-9]+$/', 'unique:students,username'],
             'password' => 'required|string|min:8|confirmed',
             'programme_id' => 'nullable|exists:programmes,id',
             'current_level' => 'nullable',
        ];
        $messages = [
             'programme_id.exists' => 'The selected programme does not exist.',
+            //'programme_id.nullable' => 'The programme id cannot be empty.',
             'current_level.in' => 'The selected level is invalid.',
             'username.regex' => 'The username field should not contain spaces or special characters.',
+            'username.unique' => 'The usernamme already  exists.',
         ];
 
         $validated = $request->validate($rules,$messages);
@@ -89,6 +89,8 @@ class AuthController extends Controller
         $student->password = bcrypt($request->password);
         $student->save();
         $token  = $student->createToken('studentToken')->plainTextToken;
+        $student->type = 'student';
+        $student->role = 'student';
 
         return response()->json([
             'message' => 'Student created successfully',

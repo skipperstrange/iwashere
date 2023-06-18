@@ -7,6 +7,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 use App\Models\Students;
+use App\Models\Courses;
+use Illuminate\Support\Facades\Auth;
 
 class StudentsController extends Controller
 {
@@ -63,5 +65,21 @@ class StudentsController extends Controller
     public function destroy(Students $students)
     {
         //
+    }
+
+    function  courses(Request $request){
+
+        //dd($user = Auth::guard('sanctum')->user());
+
+        $student = Auth::guard('sanctum')->user();
+
+        if (!$student) {
+            return response()->json(['error' => 'No programme found'], 404);
+        }
+        $student['courses'] = $student->courses;
+
+        return response()->json([
+            'data' =>  $student,
+        ]);
     }
 }
